@@ -43,7 +43,7 @@ String GPS;
 boolean newGPS;
 
 void setup() {
-  Serial.begin(115200);      // initialize serial communication
+  Serial.begin(9600);      // initialize serial communication
   pinMode(RED_LED, OUTPUT);      // set the LED pin mode
   pinMode(YELLOW_LED, OUTPUT);
   pinMode(GREEN_LED, OUTPUT);
@@ -129,6 +129,7 @@ void loop() {
             client.println("<h1 align=center><font color=\"red\">Welcome to the CC3200 WiFi Web Server</font></h1>");
             client.print("RED LED <button onclick=\"location.href='/H'\">HIGH</button>");
             client.println(" <button onclick=\"location.href='/L'\">LOW</button><br>");
+            client.println(GPS);
 
             // The HTTP response ends with another blank line:
             client.println();
