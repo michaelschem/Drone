@@ -37,9 +37,22 @@ int keyIndex = 0;
 
 WiFiServer server(80);
 
+//GPS Stuff
+String gpsBuffer;
+String GPS;
+boolean newGPS;
+
 void setup() {
   Serial.begin(115200);      // initialize serial communication
   pinMode(RED_LED, OUTPUT);      // set the LED pin mode
+  pinMode(YELLOW_LED, OUTPUT);
+  pinMode(GREEN_LED, OUTPUT);
+  
+  digitalWrite(RED_LED, LOW);
+  digitalWrite(YELLOW_LED, LOW);
+  digitalWrite(GREEN_LED, LOW);
+  
+  newGPS = false;
 
   // attempt to connect to Wifi network:
   Serial.print("Attempting to connect to Network named: ");
@@ -50,8 +63,13 @@ void setup() {
   while ( WiFi.status() != WL_CONNECTED) {
     // print dots while we wait to connect
     Serial.print(".");
-    delay(300);
+    digitalWrite(YELLOW_LED, HIGH);
+    delay(150);
+    digitalWrite(YELLOW_LED, LOW);
+    delay(150);
   }
+  
+  digitalWrite(YELLOW_LED, HIGH);
   
   Serial.println("\nYou're connected to the network");
   Serial.println("Waiting for an ip address");
@@ -59,8 +77,13 @@ void setup() {
   while (WiFi.localIP() == INADDR_NONE) {
     // print dots while we wait for an ip addresss
     Serial.print(".");
-    delay(300);
+    digitalWrite(GREEN_LED, HIGH);
+    delay(150);
+    digitalWrite(GREEN_LED, LOW);
+    delay(150);
   }
+  
+  digitalWrite(GREEN_LED, HIGH);
 
   Serial.println("\nIP Address obtained");
   
@@ -73,6 +96,12 @@ void setup() {
 }
 
 void loop() {
+  probeGPS();
+  if(newGPS){
+    Serial.println(GPS);
+    newGPS = false;
+  }
+  
   int i = 0;
   WiFiClient client = server.available();   // listen for incoming clients
 
@@ -80,7 +109,8 @@ void loop() {
     Serial.println("new client");           // print a message out the serial port
     char buffer[150] = {0};                 // make a buffer to hold incoming data
     while (client.connected()) {            // loop while the client's connected
-      if (client.available()) {             // if there's bytes to read from the client,
+      if (client.available()) {        // if there's bytes to read from the client,
+      digitalWrite(RED_LED, HIGH);
         char c = client.read();             // read a byte, then
         Serial.write(c);                    // print it out the serial monitor
         if (c == '\n') {                    // if the byte is a newline character
@@ -123,6 +153,7 @@ void loop() {
         }
       }
     }
+    digitalWrite(RED_LED, LOW);
     // close the connection:
     client.stop();
     Serial.println("client disonnected");
@@ -166,4 +197,20 @@ void printWifiStatus() {
   // print where to go in a browser:
   Serial.print("To see this page in action, open a browser to http://");
   Serial.println(ip);
+}
+
+void probeGPS(){
+  while(Serial.available()) {
+    char next = Serial.read();
+    if(next != '\n'){
+      gpsBuffer += next;
+    } else {
+      if(gpsBuffer.startsWith("$GPGLL")){
+        //Serial.println(gpsBuffer);
+        GPS = gpsBuffer;
+        newGPS = true;
+      }
+      gpsBuffer = "";
+    }
+  }
 }
