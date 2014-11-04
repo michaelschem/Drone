@@ -26,8 +26,7 @@ char ssid[] = "Fi";
 char password[] = "ThQQ^3$SJ458";
 
 //GPS Stuff
-char gpsBuffer[200];
-char GPS[200];
+char GPS[500];
 int gpsBufferLocation;
 
 unsigned int localPort = 2390;      // local port to listen on
@@ -125,19 +124,14 @@ void probeGPS(){
   while(Serial.available()) {
     char next = Serial.read();
     if(next != '\n'){
-      gpsBuffer[gpsBufferLocation] = next;
-      gpsBufferLocation++;
-    } else {
-      if(gpsBuffer[5] == 'L'){
-        for(int i =  0; i < 200; i++){
-          GPS[i] = gpsBuffer[i];
-        }
-        gpsBufferLocation = 0;
-      for(int i = 0; i < 200; i++){
-        gpsBuffer[i] = ' ';
+      if(next != '\r'){
+    GPS[gpsBufferLocation] = next;
+    gpsBufferLocation++;
+    
+    if(gpsBufferLocation == 500){
+      gpsBufferLocation = 0;
+    }
       }
-      }
-      
     }
   }
 }
