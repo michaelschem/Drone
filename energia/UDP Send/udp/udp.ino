@@ -37,6 +37,14 @@ char  ReplyBuffer[] = "acknowledged: ";       // a string to send back
 WiFiUDP Udp;
 
 void setup() {
+  pinMode(RED_LED, OUTPUT); 
+  pinMode(YELLOW_LED, OUTPUT);
+  pinMode(GREEN_LED, OUTPUT);
+  
+  digitalWrite(RED_LED, LOW);
+  digitalWrite(YELLOW_LED, LOW);
+  digitalWrite(GREEN_LED, LOW);
+  
   gpsBufferLocation = 0;
   //Initialize serial and wait for port to open:
   Serial.begin(9600);
@@ -49,18 +57,25 @@ void setup() {
   WiFi.begin(ssid, password);
   while ( WiFi.status() != WL_CONNECTED) {
     // print dots while we wait to connect
-    Serial.print(".");
-    delay(300);
+    digitalWrite(YELLOW_LED, HIGH);
+    delay(150);
+    digitalWrite(YELLOW_LED, LOW);
+    delay(150);
   }
   
+  digitalWrite(YELLOW_LED, HIGH);
   Serial.println("\nYou're connected to the network");
   Serial.println("Waiting for an ip address");
   
   while (WiFi.localIP() == INADDR_NONE) {
     // print dots while we wait for an ip addresss
-    Serial.print(".");
-    delay(300);
+    digitalWrite(GREEN_LED, HIGH);
+    delay(150);
+    digitalWrite(GREEN_LED, LOW);
+    delay(150);
   }
+  
+  digitalWrite(GREEN_LED, HIGH);
 
   Serial.println("\nIP Address obtained");
   printWifiStatus();
@@ -96,6 +111,9 @@ void loop() {
     Udp.write(packetBuffer);
     if(packetBuffer[0] == 'G'){
         Udp.write(GPS);
+    }
+    if(packetBuffer[0] == 'S'){
+        Udp.write(WiFi.RSSI());
     }
     Udp.endPacket();
   }
