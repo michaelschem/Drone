@@ -21,13 +21,14 @@
 #include <WiFi.h>
 
 // your network name also called SSID
-char ssid[] = "Fi";
+char ssid[] = "private";
 // your network password
-char password[] = "ThQQ^3$SJ458";
+char password[] = "vastcartoon245";
 
 //GPS Stuff
-char GPS[500];
-int gpsBufferLocation;
+String gpsBuffer;
+String GPS;
+boolean newGPS;
 
 unsigned int localPort = 2390;      // local port to listen on
 
@@ -37,6 +38,8 @@ char  ReplyBuffer[] = "acknowledged: ";       // a string to send back
 WiFiUDP Udp;
 
 void setup() {
+  newGPS = false;
+  
   pinMode(RED_LED, OUTPUT); 
   pinMode(YELLOW_LED, OUTPUT);
   pinMode(GREEN_LED, OUTPUT);
@@ -45,7 +48,6 @@ void setup() {
   digitalWrite(YELLOW_LED, LOW);
   digitalWrite(GREEN_LED, LOW);
   
-  gpsBufferLocation = 0;
   //Initialize serial and wait for port to open:
   Serial.begin(9600);
 
@@ -86,36 +88,13 @@ void setup() {
 
 void loop() {
   probeGPS();
-
-  // if there's data available, read a packet
-  int packetSize = Udp.parsePacket();
-  if (packetSize)
-  {
-    Serial.print("Received packet of size ");
-    Serial.println(packetSize);
-    Serial.print("From ");
-    IPAddress remoteIp = Udp.remoteIP();
-    Serial.print(remoteIp);
-    Serial.print(", port ");
-    Serial.println(Udp.remotePort());
-
-    // read the packet into packetBufffer
-    int len = Udp.read(packetBuffer, 255);
-    if (len > 0) packetBuffer[len] = 0;
-    Serial.println("Contents:");
-    Serial.println(packetBuffer);
-
-    // send a reply, to the IP address and port that sent us the packet we received
-    Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-    Udp.write(ReplyBuffer);
-    Udp.write(packetBuffer);
-    if(packetBuffer[0] == 'G'){
-        Udp.write(GPS);
-    }
-    if(packetBuffer[0] == 'S'){
-        Udp.write(WiFi.RSSI());
-    }
+  if(newGPS){
+    Udp.beginPacket("192.168.2.197", 42679);
+    Udp.print(GPS);
     Udp.endPacket();
+    
+    Serial.println(GPS);
+    newGPS = false;
   }
 }
 
@@ -142,15 +121,16 @@ void probeGPS(){
   while(Serial.available()) {
     char next = Serial.read();
     if(next != '\n'){
-      if(next != '\r'){
-    GPS[gpsBufferLocation] = next;
-    gpsBufferLocation++;
-    
-    if(gpsBufferLocation == 500){
-      gpsBufferLocation = 0;
-    }
+      gpsBuffer += next;
+    } else {
+      if(gpsBuffer.startsWith("$GPGLL")){
+        //Serial.println(gpsBuffer);
+        GPS = gpsBuffer;
+        newGPS = true;
       }
+      gpsBuffer = "";
     }
   }
 }
+
 
