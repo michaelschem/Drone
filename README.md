@@ -10,6 +10,8 @@ I. Install Continuum Analytics Anaconda Python Distribution for Python 2.7
 
   1. Install Guide: http://docs.continuum.io/anaconda/install.html
 
+  2. Note: Comes with Spyder IDE, so you don't need to get one seperately
+
 
 II. Install OpenCV
 
