@@ -4,7 +4,7 @@ Drone
 Drone project for senior design using TI Chip CC3200
 
 
-HOWTO RUN OPENCV CODE
+1.1 OPENCV CODE
 -----
 
 I. Install Continuum Analytics Anaconda Python Distribution for Python 2.7
@@ -23,3 +23,9 @@ II. Install OpenCV
   3. Note: FFMPEG is an important 3rd party library for video manipulation in OpenCV but may not install properly after following the above tutorial. I
   spent a fair amount of time messing with FFMPEG before I go it working, and I
   will add as coherent a tutorial as possible if I can.
+
+1.2 Energia
+-----
+
+The Energia libraries are the code behind the primary operation of the CC3200 chip.  Documentation and installation instructions can be found at energuia.nu.
+
