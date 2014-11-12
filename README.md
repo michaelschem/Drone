@@ -4,7 +4,8 @@ Drone
 Drone project for senior design using TI Chip CC3200
 
 
-::HOWTO RUN OPENCV CODE::
+HOWTO RUN OPENCV CODE
+-----
 
 I. Install Continuum Analytics Anaconda Python Distribution for Python 2.7
 
