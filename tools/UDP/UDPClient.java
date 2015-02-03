@@ -10,7 +10,7 @@ class UDPClient
 
       DatagramSocket clientSocket = new DatagramSocket();
 
-      InetAddress IPAddress = InetAddress.getByName("192.168.2.106");
+      InetAddress IPAddress = InetAddress.getByName("schem.ddns.net");
       //InetAddress IPAddress = InetAddress.getByName("localhost");
       System.out.println(IPAddress.toString());
 
