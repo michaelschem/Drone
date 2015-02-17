@@ -22,11 +22,11 @@ void probeGPS(){
     if(next != '\n'){
       gpsBuffer += next;
     } else {
-      if(gpsBuffer.startsWith("$GPGLL")){
+      //if(gpsBuffer.startsWith("$GPGLL")){
         //Serial.println(gpsBuffer);
         GPS = gpsBuffer;
         newGPS = true;
-      }
+      //}
       gpsBuffer = "";
     }
   }

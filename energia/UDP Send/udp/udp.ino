@@ -1,24 +1,27 @@
 
 /*
   WiFi UDP Send and Receive String
-
+ 
  This sketch wait an UDP packet on localPort using the CC3200 launchpad
  When a packet is received an Acknowledge packet is sent to the client on port remotePort
-
-
+ 
+ 
  created 30 December 2012
  by dlf (Metodo2 srl)
  
  modified 1 July 2014
  by Noah Luskey
-
+ 
  */
 
 #ifndef __CC3200R1M1RGC__
 // Do not include SPI for CC3200 LaunchPad
-#include <SPI.h>
+//#include <SPI.h>
 #endif
 #include <WiFi.h>
+#include <Wire.h>
+#include <BMA222.h>
+
 
 // your network name also called SSID
 char ssid[] = "private";
@@ -36,18 +39,19 @@ char packetBuffer[255]; //buffer to hold incoming packet
 char  ReplyBuffer[] = "acknowledged: ";       // a string to send back
 
 WiFiUDP Udp;
+BMA222 mySensor;
 
 void setup() {
   newGPS = false;
-  
+
   pinMode(RED_LED, OUTPUT); 
   pinMode(YELLOW_LED, OUTPUT);
   pinMode(GREEN_LED, OUTPUT);
-  
+
   digitalWrite(RED_LED, LOW);
   digitalWrite(YELLOW_LED, LOW);
   digitalWrite(GREEN_LED, LOW);
-  
+
   //Initialize serial and wait for port to open:
   Serial.begin(9600);
 
@@ -64,11 +68,11 @@ void setup() {
     digitalWrite(YELLOW_LED, LOW);
     delay(150);
   }
-  
+
   digitalWrite(YELLOW_LED, HIGH);
   Serial.println("\nYou're connected to the network");
   Serial.println("Waiting for an ip address");
-  
+
   while (WiFi.localIP() == INADDR_NONE) {
     // print dots while we wait for an ip addresss
     digitalWrite(GREEN_LED, HIGH);
@@ -76,7 +80,7 @@ void setup() {
     digitalWrite(GREEN_LED, LOW);
     delay(150);
   }
-  
+
   digitalWrite(GREEN_LED, HIGH);
 
   Serial.println("\nIP Address obtained");
@@ -87,12 +91,28 @@ void setup() {
 }
 
 void loop() {
+
+
+
   probeGPS();
   if(newGPS){
+    /*
+    int8_t acclData = mySensor.readXData();
+    Udp.beginPacket("192.168.2.197", 42679);
+    Udp.print("ACCL: X: ");
+    Udp.print(acclData);
+    acclData = mySensor.readYData();
+    Udp.print(" Y: ");
+    Udp.print(acclData);
+    acclData = mySensor.readZData();
+    Udp.print(" Z: ");
+    Udp.print(acclData);
+    Udp.endPacket();
+*/
     Udp.beginPacket("192.168.2.197", 42679);
     Udp.print(GPS);
     Udp.endPacket();
-    
+
     Serial.println(GPS);
     newGPS = false;
   }
@@ -122,8 +142,9 @@ void probeGPS(){
     char next = Serial.read();
     if(next != '\n'){
       gpsBuffer += next;
-    } else {
-      if(gpsBuffer.startsWith("$GPGLL")){
+    } 
+    else {
+      if(gpsBuffer.startsWith("$GPGGA") || gpsBuffer.startsWith("$GPRMC")){
         //Serial.println(gpsBuffer);
         GPS = gpsBuffer;
         newGPS = true;
@@ -132,5 +153,6 @@ void probeGPS(){
     }
   }
 }
+
 
 
