@@ -3,35 +3,37 @@ import java.net.*;
 
 class UDPClient
 {
-   public static void main(String args[]) throws Exception
-   {
-      BufferedReader inFromUser =
-         new BufferedReader(new InputStreamReader(System.in));
+	public static void main(String args[]) throws Exception
+	{
+		while(true) {
+			BufferedReader inFromUser =
+			new BufferedReader(new InputStreamReader(System.in));
 
-      DatagramSocket clientSocket = new DatagramSocket();
+			DatagramSocket clientSocket = new DatagramSocket();
 
-      InetAddress IPAddress = InetAddress.getByName("schem.ddns.net");
+			InetAddress IPAddress = InetAddress.getByName("127.0.0.1");
       //InetAddress IPAddress = InetAddress.getByName("localhost");
-      System.out.println(IPAddress.toString());
+			System.out.println(IPAddress.toString());
 
-      byte[] sendData = new byte[1024];
-      byte[] receiveData = new byte[1024];
+			byte[] sendData = new byte[1024];
+			byte[] receiveData = new byte[1024];
 
-      String sentence = inFromUser.readLine();
+			String sentence = inFromUser.readLine();
 
-      sendData = sentence.getBytes();
+			sendData = sentence.getBytes();
 
-      DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 2390);
-      
-      clientSocket.send(sendPacket);
-      
-      DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-      
-      clientSocket.receive(receivePacket);
-      
-      String modifiedSentence = new String(receivePacket.getData());
-      System.out.println("FROM SERVER:" + modifiedSentence);
-      
-      clientSocket.close();
-   }
+			DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 6000);
+
+			clientSocket.send(sendPacket);
+
+      //DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+
+      //clientSocket.receive(receivePacket);
+
+      //String modifiedSentence = new String(receivePacket.getData());
+      //System.out.println("FROM SERVER:" + modifiedSentence);
+
+			clientSocket.close();
+		}
+	}
 }
