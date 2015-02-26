@@ -3,6 +3,7 @@ import hypermedia.net.*;
 angle a1;
 compas c1;
 altimeter a2;
+speed s1;
 UDP udp;
 JSONObject json;
 
@@ -21,6 +22,7 @@ void setup() {
   a1 = new angle();
   c1 = new compas();
   a2 = new altimeter();
+  s1 = new speed();
 }
 
 void receive( byte[] data ) {
@@ -48,36 +50,36 @@ void reset() {
   strokeWeight(0);
   rect(0, 300, 600, 300);
   strokeWeight(1);
-  
+
   //FPS CALCULATION
   time = second() + (minute() * 60);
-  if(time != last_time) {
+  if (time != last_time) {
     last_fps = fps;
     fps = 0;
     last_time = second() + (minute() * 60);
   }
-  
-  //fill(255);
-  //rect(0,300,600,300);
-  
+
   textSize(12);
-  text("FPS: " + last_fps, 310, 60);
+  text("FPS: " + last_fps, 10, 10);
 }
 
 void draw() {
   reset();
-  
+
+  pushMatrix();
   pushMatrix();
   pushMatrix();
   a1.rot(radians(rollAngle));
   a1.dispaly(pitchAngle);
-  
+
   popMatrix();
   c1.rot(radians(0));
-  c1.display();
+  c1.display(pitchAngle);
+
+  popMatrix();
+  a2.display(rollAngle);
   
   popMatrix();
-  a2.display();
-  
+  s1.display(pitchAngle);
 }
 

@@ -32,8 +32,11 @@ getbufflencommand = [COMMANDSEND, SERIALNUM, CMD_GETBUFFLEN, 0x01, FBUF_CURRENTF
 
 def checkreply(r, b):
     r = map (ord, r)
+    print 'checkreply: completed  map, len=', len(r)    #added for debug
+    print 'r =', r          #added for debug
     if (r[0] == 0x76 and r[1] == SERIALNUM and r[2] == b and r[3] == 0x00):
         return True
+    print 'checkReply(): failed, r=', r
     return False
 
 def reset():

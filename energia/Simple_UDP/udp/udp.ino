@@ -5,7 +5,8 @@
 char ssid[] = "private";
 char password[] = "vastcartoon245";
 unsigned int localPort = 2390;
-char serverIP[] = "192.168.2.197";
+char serverIP[] = "192.168.20.2";
+//char serverIP[] = "192.168.2.197";
 int serverPort = 42679;
 IPAddress ip;
 long rssi;
