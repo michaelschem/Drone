@@ -26,6 +26,7 @@ class UDPClient
 
 			clientSocket.send(sendPacket);
 
+       //Uncomment to wait for server ack
       //DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
 
       //clientSocket.receive(receivePacket);

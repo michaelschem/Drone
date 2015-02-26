@@ -17,6 +17,7 @@ class UDPServer
          sentence = null;
          receivePacket = null;
 
+         //uncomment to wait for server
          //InetAddress IPAddress = receivePacket.getAddress();
          //int port = receivePacket.getPort();
          //String capitalizedSentence = sentence.toUpperCase();

@@ -21,7 +21,7 @@ class angle {
   }
 
   void rot(float i) {
-    translate(150, 150);
+    translate(300, 300);
     rotate(i);
   }
 }
