@@ -20,4 +20,3 @@ class compas {
     rotate(i);
   }
 }
-

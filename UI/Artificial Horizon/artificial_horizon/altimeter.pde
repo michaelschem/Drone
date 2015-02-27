@@ -1,5 +1,5 @@
 class altimeter {
-  void display(int alt) {
+  void display(float alt) {
     fill(255);
     stroke(0);
     rect(500,100,80,400);
