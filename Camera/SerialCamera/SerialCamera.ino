@@ -116,15 +116,15 @@ void VC0706_compression_ratio(int ratio)
   if(ratio>63)ratio=63;
   if(ratio<13)ratio=13;
   int vc_comp_ratio=(ratio-13)*4+53;
-  tx_vcbuffer[0]=VC0706_PROTOCOL_SIGN;
-  tx_vcbuffer[1]=VC0706_SERIAL_NUMBER;
-  tx_vcbuffer[2]=VC0706_COMMAND_WRITE_DATA;
+  tx_vcbuffer[0]=VC0706_PROTOCOL_SIGN; //56
+  tx_vcbuffer[1]=VC0706_SERIAL_NUMBER; //00
+  tx_vcbuffer[2]=VC0706_COMMAND_WRITE_DATA; //31
   tx_vcbuffer[3]=0x05;
   tx_vcbuffer[4]=01;		//chip register
   tx_vcbuffer[5]=0x01;	//data num ready to write
   tx_vcbuffer[6]=0x12;	//register address
   tx_vcbuffer[7]=0x04;
-  tx_vcbuffer[8]=vc_comp_ratio; //data
+  tx_vcbuffer[8]=vc_comp_ratio; //data //
 
   tx_counter=8;
 
@@ -202,15 +202,17 @@ void capture_photo(){
   vc_frame_address =READ_DATA_BLOCK_NO;
 
   while(vc_frame_address<frame_length){	
+    //Serial.print("Accessing Data \n");
     VC0706_read_frame_buffer(vc_frame_address-READ_DATA_BLOCK_NO, READ_DATA_BLOCK_NO);
     delay(9);
+    //Serial.print("Data Accessed \n");
 
     //get the data with length=READ_DATA_BLOCK_NObytes 
     rx_ready=false;
     rx_counter=0;
     buffer_read();
 
-    for(int i = 5; i < 67;i++)
+    for(int i = 5; i < 61;i++)
     {
 //       if(VC0706_rx_buffer[i] < 2)
 //        Serial.print("0000000");
@@ -226,12 +228,12 @@ void capture_photo(){
 //        Serial.print("00");
 //      else if(VC0706_rx_buffer[i] < 128)
 //        Serial.print("0");
-      if(VC0706_rx_buffer[i] < 16)
+     if(VC0706_rx_buffer[i] < 16)
         Serial.print("0");
       Serial.print(VC0706_rx_buffer[i], HEX);
-      Serial.print(' ');
+      //Serial.print(' ');
     }
-    Serial.print('\n');
+    //Serial.print('\n');
 
     //read next READ_DATA_BLOCK_NO bytes from frame buffer
     vc_frame_address=vc_frame_address+READ_DATA_BLOCK_NO;
@@ -250,7 +252,7 @@ void capture_photo(){
   rx_ready=false;
   rx_counter=0;
   buffer_read();
-  for(int i = 5; i < 67;i++)
+  for(int i = 5; i < 61;i++)
   {
 //    if(VC0706_rx_buffer[i] < 2)
 //      Serial.print("0000000");
@@ -269,7 +271,7 @@ void capture_photo(){
     if(VC0706_rx_buffer[i] < 16)
       Serial.print("0");
     Serial.print(VC0706_rx_buffer[i], HEX);
-    Serial.print(' ');
+    //Serial.print(' ');
   }
   
 
