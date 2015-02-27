@@ -13,11 +13,15 @@ for filename in glob.iglob(os.path.join('Unclean', '*.txt')):
         # open file as write only
         __out_num__ += 1
         # output cleaned files to this directory
-        out_file = 'Clean/clean2_'+str(__out_num__)+'.bin'
-        cleaned_data_output = open(out_file, 'wb')
+        out_file = 'Clean/clean2_'+str(__out_num__)+'.txt'
+        cleaned_data_output = open(out_file, 'w')
+
+        # remove alphanumerics
+        regex = re.compile('[\S\D]')
+        camera_data_text = regex.sub('', camera_data_text)
 
         # replace V2 with space
-        regex = re.compile('[Vv][2]')
+        regex = re.compile('[Vv] [2]')
         camera_data_text = regex.sub(' ', camera_data_text)
 
         # remove other strings that are longer than 2 chars
