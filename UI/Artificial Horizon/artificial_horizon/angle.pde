@@ -2,7 +2,7 @@ class angle {
   angle() {
   }
 
-  void dispaly(int y) {
+  void dispaly(float y) {
     stroke(255);
     strokeWeight(1);
     fill(255);
