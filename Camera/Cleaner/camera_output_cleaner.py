@@ -16,40 +16,23 @@ for filename in glob.iglob(os.path.join('Unclean', '*.txt')):
         out_file = 'Clean/clean2_'+str(__out_num__)+'.txt'
         cleaned_data_output = open(out_file, 'w')
 
-        # remove alphanumerics
-        regex = re.compile('[\S\D]')
-        camera_data_text = regex.sub('', camera_data_text)
-
         # replace V2 with space
-        regex = re.compile('[Vv] [2]')
+        regex = re.compile('[Vv]')
         camera_data_text = regex.sub(' ', camera_data_text)
 
-        # remove other strings that are longer than 2 chars
-        regex = re.compile('\S{3,}')
-        camera_data_text = regex.sub('', camera_data_text, 4)
-
-        # remove spaces
-        regex = re.compile(' +')
-        camera_data_text = regex.sub('', camera_data_text)
-
         # remove any strings that clearly aren't hex
-        regex = re.compile('[^ABCDEF\s\d]\d{0,}')
+        regex = re.compile('[^ABCDEF\d\n]{0,}')
         camera_data_text = regex.sub('', camera_data_text)
 
-        # remove any 1-2char strings left alone on their own lines
-        regex = re.compile('\n[\w\d]{1,2}\n')
-        camera_data_text = regex.sub('', camera_data_text)
-
-        # # remove all empty lines followed by another empty line
-        regex = re.compile('\n(?=\n)')
-        camera_data_text = regex.sub('', camera_data_text)
+        # remove all other random characters
+        regex = re.compile('([ABCDEF\d]{113})')
+        newlist = re.findall(regex,camera_data_text)
 
         # # reinsert spaces to show each byte
         # camera_data_text = re.sub('([\d\w]{2})','\\1 ',camera_data_text)
 
-        # # reinsert extra new lines between lines
-        # camera_data_text = re.sub('(\n)','\\1\n',camera_data_text)
-
         # string_to_hex(camera_data_text)
-        cleaned_data_output.write(camera_data_text.encode('utf-8'))
+        for item in newlist:
+            print item
+            cleaned_data_output.write(item)
 
