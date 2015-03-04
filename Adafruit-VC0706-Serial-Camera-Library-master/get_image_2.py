@@ -2,11 +2,12 @@
 # pretty basic stuff
 # written by ladyada. MIT license
 
-import serial, time
+import serial
+import time
 
 BAUD = 38400
-PORT = "COM7"      # change this to your com port!
-TIMEOUT = 0.5
+PORT = "COM7"
+TIMEOUT = 0.2
 
 SERIALNUM = 0    # start with 0
 
@@ -28,16 +29,14 @@ getversioncommand = [COMMANDSEND, SERIALNUM, CMD_GETVERSION, COMMANDEND]
 resetcommand = [COMMANDSEND, SERIALNUM, CMD_RESET, COMMANDEND]
 takephotocommand = [COMMANDSEND, SERIALNUM, CMD_TAKEPHOTO, 0x01, FBUF_STOPCURRENTFRAME]
 getbufflencommand = [COMMANDSEND, SERIALNUM, CMD_GETBUFFLEN, 0x01, FBUF_CURRENTFRAME]
-readphotocommand = [COMMANDSEND, SERIALNUM, CMD_READBUFF, 0x0c, FBUF_CURRENTFRAME, 0x0a]
 
 def checkreply(r, b):
     r = map (ord, r)
-    # print 'checkreply: completed  map, len=', len(r)    #added for debug
-    # print 'r =', r          #added for debug
-    if len(r) > 0:
-        if (r[0] == 0x76 and r[1] == SERIALNUM and r[2] == b and r[3] == 0x00):
-            return True
-    print 'checkReply(): failed, r=', r
+    #print 'checkreply: completed  map, len=', len(r)
+    #print 'r =', r
+    if (r[0] == 0x76 and r[1] == SERIALNUM and r[2] == b and r[3] == 0x00):
+        return True
+    print 'checkReply() failed'
     return False
 
 def reset():
@@ -45,19 +44,17 @@ def reset():
     s.write(cmd)
     reply = s.read(100)
     r = list(reply)
-    # print 'reset command', resetcommand, 'reply', map (ord, r)
     if checkreply(r, CMD_RESET):
         return True
+    print 'reset(): failure'
     return False
 
 def getversion():
     cmd = ''.join (map (chr, getversioncommand))
     s.write(cmd)
-    reply = s.read(16)
+    reply =  s.read(16)
     r = list(reply);
-    # print 'getversion command', getversioncommand, 'reply', map (ord, r)
     if checkreply(r, CMD_GETVERSION):
-        # print r
         return True
     return False
 
@@ -87,40 +84,36 @@ def getbufferlength():
 
     return 0
 
-READSIZE = 256
+readphotocommand = [COMMANDSEND, SERIALNUM, CMD_READBUFF, 0x0c, FBUF_CURRENTFRAME, 0x0a]
+
 
 def readbuffer(bytes2read):
     addr = 0
     photo = []
 
-    while (addr < bytes2read + READSIZE):
+    while (addr < bytes2read + 32):
         command = readphotocommand + [(addr >> 24) & 0xFF, (addr >> 16) & 0xFF,
                                       (addr >> 8) & 0xFF, addr & 0xFF]
-        command +=  [(READSIZE>>24) & 0xFF, (READSIZE>>16) & 0xFF, (READSIZE>>8) & 0xFF, READSIZE & 0xFF]
-        command +=  [0x10,0]        # delay of 40.96 ms (was 10 ms)
-#        print 'cmd=', map(hex, command)
+        command +=  [0, 0, 0, 32]   # 32 bytes at a time
+        command +=  [0x10,0]         # delay of 20ms (was 10 ms)
+        #print map(hex, command)
         cmd = ''.join(map (chr, command))
         s.write(cmd)
-        reply = s.read(5 + READSIZE + 5)
+        reply = s.read(32+5)
         r = list(reply)
-#        print r
-        if (len(r) != 5 + READSIZE + 5):
-            # print 'Receive count error'
-            # print 'Command sent was: ', cmd
-            # print 'r is:', r
+        if (len(r) != 37):
             continue
+        #print r
         if (not checkreply(r, CMD_READBUFF)):
             print "ERROR READING PHOTO"
-            exit()
-        photo += r[5:READSIZE+5]
-        addr += READSIZE
-    print 'photo len=', len(photo)
+            return
+        photo += r[5:]
+        addr += 32
     return photo
-
 
 ######## main
 
-s = serial.Serial(PORT, baudrate=BAUD, rtscts=False, timeout=TIMEOUT)
+s = serial.Serial(PORT, baudrate=BAUD, timeout=TIMEOUT)
 
 reset()
 
@@ -139,12 +132,10 @@ bytes2read = getbufferlength()
 print bytes2read, "bytes to read"
 
 photo = readbuffer(bytes2read)
-#photo = readbuffer(5024)
-
-f = open("photo.jpg", 'w')
-#print photo
 photodata = ''.join(photo)
+f = open("photo_2.jpg", 'wb')
 f.write(photodata)
+
 f.close()
+
 s.close()
-#print length(photo)
