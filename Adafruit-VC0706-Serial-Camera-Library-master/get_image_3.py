@@ -29,6 +29,9 @@ getversioncommand = [COMMANDSEND, SERIALNUM, CMD_GETVERSION, COMMANDEND]
 resetcommand = [COMMANDSEND, SERIALNUM, CMD_RESET, COMMANDEND]
 takephotocommand = [COMMANDSEND, SERIALNUM, CMD_TAKEPHOTO, 0x01, FBUF_STOPCURRENTFRAME]
 getbufflencommand = [COMMANDSEND, SERIALNUM, CMD_GETBUFFLEN, 0x01, FBUF_CURRENTFRAME]
+readphotocommand = [COMMANDSEND, SERIALNUM, CMD_READBUFF, 0x0c, FBUF_CURRENTFRAME, 0x0a]
+s = serial.Serial(PORT, baudrate=BAUD, timeout=TIMEOUT)
+
 
 def checkreply(r, b):
     r = map (ord, r)
@@ -38,6 +41,7 @@ def checkreply(r, b):
         return True
     print 'checkReply() failed'
     return False
+
 
 def reset():
     cmd = ''.join (map (chr, resetcommand))
@@ -49,6 +53,7 @@ def reset():
     print 'reset(): failure'
     return False
 
+
 def getversion():
     cmd = ''.join (map (chr, getversioncommand))
     s.write(cmd)
@@ -58,6 +63,7 @@ def getversion():
         return True
     return False
 
+
 def takephoto():
     cmd = ''.join (map (chr, takephotocommand))
     s.write(cmd)
@@ -66,6 +72,7 @@ def takephoto():
     if (checkreply(r, CMD_TAKEPHOTO) and r[3] == chr(0x0)):
         return True
     return False
+
 
 def getbufferlength():
     cmd = ''.join (map (chr, getbufflencommand))
@@ -81,16 +88,12 @@ def getbufferlength():
         l <<= 8
         l += ord(r[8])
         return l
-
     return 0
-
-readphotocommand = [COMMANDSEND, SERIALNUM, CMD_READBUFF, 0x0c, FBUF_CURRENTFRAME, 0x0a]
 
 
 def readbuffer(bytes2read):
     addr = 0
     photo = []
-
     while (addr < bytes2read + 32):
         command = readphotocommand + [(addr >> 24) & 0xFF, (addr >> 16) & 0xFF,
                                       (addr >> 8) & 0xFF, addr & 0xFF]
@@ -111,31 +114,34 @@ def readbuffer(bytes2read):
         addr += 32
     return photo
 
+
+def take_picture(pic_num):
+
+    reset()
+    time.sleep(2)
+    if (not getversion()):
+        print "Camera not found"
+        exit()
+    print "VC0706 Camera found"
+    if takephoto():
+        print "Snap!"
+    bytes2read = getbufferlength()
+    print bytes2read, "bytes to read"
+    photo = readbuffer(bytes2read)
+    photodata = ''.join(photo)
+    f = open("pic"+str(pic_num)+".jpg", 'wb')
+    f.write(photodata)
+    f.close()
+    s.close()
+
+
 ######## main
 
-s = serial.Serial(PORT, baudrate=BAUD, timeout=TIMEOUT)
-
-reset()
-
-time.sleep(2)
-
-if (not getversion()):
-    print "Camera not found"
-    exit()
-print "VC0706 Camera found"
-
-if takephoto():
-    print "Snap!"
-
-bytes2read = getbufferlength()
-
-print bytes2read, "bytes to read"
-
-photo = readbuffer(bytes2read)
-photodata = ''.join(photo)
-f = open("photo.jpg", 'wb')
-f.write(photodata)
-
-f.close()
-
+start = time.time()
+for i in range(0,5):
+    take_picture(i+1)
+    time.sleep(2)
+    s = serial.Serial(PORT, baudrate=BAUD, timeout=TIMEOUT)
+end = time.time()
+print "Duration: ", str(end-start), str((end-start)/5)
 s.close()
