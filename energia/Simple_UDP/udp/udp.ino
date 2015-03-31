@@ -7,11 +7,10 @@
 #include <Wire.h>
 #include <BMA222.h>
 
-char ssid[] = "private";
-char password[] = "vastcartoon245";
+char ssid[] = "Dr1";
+char password[] = "theDRONEteam1";
 unsigned int localPort = 2390;
-//char serverIP[] = "192.168.20.2";
-char serverIP[] = "192.168.2.197";
+char serverIP[] = "192.168.1.101";
 int serverPort = 42679;
 IPAddress ip;
 long rssi;
@@ -62,24 +61,24 @@ void initSensors()
 
 void setup()
 {
-  Serial.begin(115200);
+  Serial.begin(9600);
   initSensors();
   newGPS = false;
   mySensor.begin();
   uint8_t chipID = mySensor.chipID();
 
-  Serial.begin(9600);
-
   WiFi.begin(ssid, password);
 
   Udp.begin(localPort);
+  
+  ip = WiFi.localIP();
+  rssi = WiFi.RSSI();
 }
 
 void loop()
 {
   //probeGPS();
-  ip = WiFi.localIP();
-  rssi = WiFi.RSSI();
+  
   //int8_t acclX = mySensor.readXData();
   //int8_t acclY = mySensor.readYData();
   //int8_t acclZ = mySensor.readZData();
