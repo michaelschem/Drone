@@ -3,7 +3,7 @@
 char ssid[] = "Dr1";
 char password[] = "theDRONEteam1";
 unsigned int localPort = 2390;
-char serverIP[] = "192.168.1.101";
+char serverIP[] = "192.168.1.100";
 int serverPort = 42679;
 IPAddress ip;
 
@@ -22,6 +22,10 @@ void setup() {
   WiFi.begin(ssid, password);
 
   Udp.begin(localPort);
+  
+  Udp.beginPacket(serverIP, serverPort);
+  Udp.print("connected");
+  Udp.endPacket();
 
 }
 
@@ -44,36 +48,18 @@ void loop()
     newGPS = false;
   } 
   
-    // scan for nearby networks:
-    Serial.println("** Scan Networks **");
-    int numSsid = WiFi.scanNetworks();
-    if (numSsid == -1)
-    {
-      Serial.println("Couldn't get a wifi connection");
-      while (true);
-    }
-  
-    // print the list of networks seen:
-    Serial.print("number of available networks:");
-    Serial.println(numSsid);
-  
-    // print the network number and name for each network found:
-    for (int thisNet = 0; thisNet < numSsid; thisNet++) 
-    {
-      Serial.print(thisNet);
-      Serial.print(") ");
-      Serial.print(WiFi.SSID(thisNet));
-      Serial.print("\tSignal: ");
-      Serial.print(WiFi.RSSI(thisNet));
-      Serial.print(" dBm\n");
-      Udp.beginPacket(serverIP, serverPort);
-      Udp.print("SSID: ");
-      Udp.print(WiFi.SSID(thisNet));
-      Udp.print("\tStrength: ");
-      Udp.print(WiFi.RSSI(thisNet));
-      Udp.endPacket();
-    }
-    delay(2000);
+  int numSsid = WiFi.scanNetworks();
+  Udp.beginPacket(serverIP, serverPort);
+  Udp.print("{");
+  for (int thisNet = 0; thisNet < numSsid; thisNet++) 
+  {
+    Udp.print(WiFi.SSID(thisNet));
+    Udp.print(":");
+    Udp.print(WiFi.RSSI(thisNet));
+    Udp.print(",");
+  }
+  Udp.print("}");
+  Udp.endPacket();
 
 }
 
