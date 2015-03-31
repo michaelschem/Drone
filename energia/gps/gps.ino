@@ -43,6 +43,37 @@ void loop()
     Udp.endPacket();
     newGPS = false;
   } 
+  
+    // scan for nearby networks:
+    Serial.println("** Scan Networks **");
+    int numSsid = WiFi.scanNetworks();
+    if (numSsid == -1)
+    {
+      Serial.println("Couldn't get a wifi connection");
+      while (true);
+    }
+  
+    // print the list of networks seen:
+    Serial.print("number of available networks:");
+    Serial.println(numSsid);
+  
+    // print the network number and name for each network found:
+    for (int thisNet = 0; thisNet < numSsid; thisNet++) 
+    {
+      Serial.print(thisNet);
+      Serial.print(") ");
+      Serial.print(WiFi.SSID(thisNet));
+      Serial.print("\tSignal: ");
+      Serial.print(WiFi.RSSI(thisNet));
+      Serial.print(" dBm\n");
+      Udp.beginPacket(serverIP, serverPort);
+      Udp.print("SSID: ");
+      Udp.print(WiFi.SSID(thisNet));
+      Udp.print("\tStrength: ");
+      Udp.print(WiFi.RSSI(thisNet));
+      Udp.endPacket();
+    }
+    delay(2000);
 
 }
 
