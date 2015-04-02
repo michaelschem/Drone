@@ -20,6 +20,14 @@ char GPS_DATA[30][30];
 char GPS_DATA2[30][30];
 boolean newGPS;
 
+//Variables for Airspeed
+unsigned int i = 0;
+unsigned int rawPressure[2];
+unsigned int pressure;
+int diff;
+int offset;
+float speed = 0;
+
 WiFiUDP Udp;
 BMA222 mySensor;
 
@@ -39,6 +47,7 @@ float seaLevelPressure = SENSORS_PRESSURE_SEALEVELHPA;
 /**************************************************************************/
 void initSensors()
 {
+  Serial.println("initSensors");
   if(!accel.begin())
   {
     /* There was a problem detecting the LSM303 ... check your connections */
@@ -62,13 +71,30 @@ void initSensors()
 void setup()
 {
   Serial.begin(9600);
+  Serial.println("setup");
   initSensors();
+  Serial.println("initSensorsDone");
+  initializeBaroSPD();
   newGPS = false;
   mySensor.begin();
   uint8_t chipID = mySensor.chipID();
-
+  Serial.println("startwifi");
   WiFi.begin(ssid, password);
-
+  //Debug
+  while ( WiFi.status() != WL_CONNECTED) 
+  {
+    Serial.print(".");
+    delay(300);
+  }
+  Serial.println("\nYou're connected to the network");
+  Serial.println("Waiting for an ip address");
+  while (WiFi.localIP() == INADDR_NONE) 
+  {
+    Serial.print(".");
+    delay(300);
+  }
+  Serial.println("\nIP Address obtained");
+  //end debug
   Udp.begin(localPort);
   
   ip = WiFi.localIP();
@@ -126,6 +152,11 @@ void loop()
   Udp.print("\", GPS_SPD: \"");
   Udp.print(GPS_SPD);
   Udp.print("' }");
+  
+  getBaroSPD();
+  Udp.print("\", \"BARO_SPD\": \"");
+  Udp.print(speed);
+  Udp.print("\"}");
   Udp.endPacket();
   delay(10);
 }
@@ -183,4 +214,29 @@ void formatGPS() {
   GPS_ALT = GPS_DATA[9];
 }
 
+void initializeBaroSPD(){
+  //Wire.begin();        // join i2c bus 
+  Serial.println("intitBaroSPD");
+  Wire.requestFrom(0x75,2);
+  while(Wire.available()){
+    rawPressure[i] = Wire.read();  //read 2 bytes from 0x75
+    i = i+1;
+  }
+  offset = (rawPressure[1]<<8)+rawPressure[0]; // get initial offset pressure
 
+
+}
+
+void getBaroSPD() {
+  Wire.requestFrom(0x75, 2);    // request 2 bytes from slave device 0x75
+  i = 0;
+  while(Wire.available())    // slave may send less than requested
+  { 
+    rawPressure[i] = Wire.read(); // receive a byte as character
+    i = i+1;
+  }
+  pressure = (rawPressure[1]<<8)+rawPressure[0]; //add two bytes together
+  diff = pressure - offset;                      //get pressure diff
+  speed = float(1.94384449)*sqrt(float(2*diff)/float(1.225));  //calc speed (kts)
+  
+}
