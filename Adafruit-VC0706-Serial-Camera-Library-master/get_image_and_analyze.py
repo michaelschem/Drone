@@ -1,11 +1,19 @@
-# python code for interfacing to VC0706 cameras and grabbing a photo
-# pretty basic stuff
-# written by ladyada. MIT license
+"""Python code for interfacing to VC0706 cameras and grabbing a photo and
+finding LED lights in them. Pretty basic stuff
+"""
+
+
+# written by ladyada. MIT license (serial and camera)
+# written by nathan moore, SMU license (opencv and image analysis)
 
 import serial
 import time
+import numpy as np
+import cv2
 
+# DON"T CHANGE THE BAUD RATE
 BAUD = 38400
+# CHECK DEVICE MANAGER FOR THE COM PORT
 PORT = "COM7"
 TIMEOUT = 0.2
 
@@ -130,19 +138,51 @@ def take_picture(pic_num):
     print bytes2read, "bytes to read"
     photo = readbuffer(bytes2read)
     photodata = ''.join(photo)
-    f = open("pic_cc3200"+str(pic_num)+".jpg", 'wb')
+    f = open("pic_test_"+str(pic_num)+".jpg", 'wb')
     f.write(photodata)
     f.close()
     s.close()
 
 
-######## main
+"""Main"""
 
-start = time.time()
-for i in range(0,num_pics):
-    take_picture(i+1)
-    time.sleep(2)
-    s = serial.Serial(PORT, baudrate=BAUD, timeout=TIMEOUT)
-end = time.time()
-print "Duration: ", str(end-start), str((end-start)/num_pics)
+
+# Take Picture
+
+take_picture(0)
 s.close()
+
+# Analyze Picture
+
+# image file
+img_file = 'pice_test_0.jpg'
+# load image
+img = cv2.imread(img_file, cv2.IMREAD_COLOR)
+# make grayscale
+gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+# blur (reduces noise)
+blur = cv2.Gauv2.cvssianBlur(gray, (3, 3), 0)
+# calculate threshold (make it a pure black and white image)
+ret_,thresh = cv2.threshold(blur, 60, 255, cv2.THRESH_BINARY)
+# find contours (LEDs)
+contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE,
+                                       cv2.CHAIN_APPROX_SIMPLE)
+# store (x,y) of the center of the led
+centers = []
+for cntr in contours:
+    (x, y), radius = cv2.minEnclosingCircle(cntr)
+    centers.append((int(x), int(y)))
+# draw circles around LEDs in image, set radius to a fixed size: 10
+size = len(centers)
+for i in range(0, size):
+    # cv2.circle(frame,centers[i],radii[i],(255,255,255),2)
+    cv2.circle(frame, centers[i], 10, (255, 255, 255), 2)
+    # Storing:
+    #   (center coords of LED, which frame,
+    #       which LED in frame, num LEDs seen in frame)
+    LED_both_locations.append((centers[i], frame_num, i+1, size))
+cv2.imshow('image', frame)
+# lets us close the window
+cv2.waitKey(0)
+# closes all windows
+cv2.destroyAllWindows()

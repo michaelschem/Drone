@@ -6,7 +6,7 @@ import serial
 import time
 
 BAUD = 38400
-PORT = "COM7"
+PORT = "COM6"
 TIMEOUT = 0.2
 
 SERIALNUM = 0    # start with 0
