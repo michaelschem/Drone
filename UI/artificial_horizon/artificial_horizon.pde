@@ -23,7 +23,8 @@ float time, last_time, fps, last_fps;
 void setup() {
   size(1200, 600);
 
-  image = loadImage("/home/mac/Drone/UI/artificial_horizon/data/map_big.jpg");
+  image = loadImage("/home/mac/Drone/UI/artificial_horizon/data/test.jpg");
+  //image = loadImage("/home/mac/Drone/UI/artificial_horizon/data/map_big.jpg");
   last_time = second() + (minute() * 60);
 
   udp = new UDP( this, 42679 );  
@@ -47,8 +48,10 @@ void draw() {
   a1.dispaly(pitchAngle);
 
   popMatrix();
+  
   c1.rot(radians(heading));
   c1.display(heading);
+  
 
   popMatrix();
   c2.display(heading);
@@ -82,7 +85,7 @@ String getElement(String json, String element) {
 
 void reset() {
   
-  image(image, 600 - map_x_offset, 0, map_width/map_zoom, map_height/map_zoom );
+  image(image, -20, -100, map_width/map_zoom, map_height/map_zoom );
 
   stroke(0);
   strokeWeight(0);
