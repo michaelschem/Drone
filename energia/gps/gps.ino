@@ -3,7 +3,7 @@
 char ssid[] = "Dr1";
 char password[] = "theDRONEteam1";
 unsigned int localPort = 2390;
-char serverIP[] = "192.168.1.100";
+char serverIP[] = "192.168.1.104";
 int serverPort = 42679;
 IPAddress ip;
 
@@ -16,6 +16,7 @@ WiFiUDP Udp;
 
 void setup() {
   Serial.begin(9600);
+  Serial.println("Started");
 
   newGPS = false;
 
@@ -26,6 +27,8 @@ void setup() {
   Udp.beginPacket(serverIP, serverPort);
   Udp.print("connected");
   Udp.endPacket();
+  
+  Serial.println("Starting Loop");
 
 }
 
@@ -48,17 +51,37 @@ void loop()
     newGPS = false;
   } 
   
+  //Scan for beacons and store their RSSIs in an array
+  //Array index corresponds to beacon number
   int numSsid = WiFi.scanNetworks();
-  Udp.beginPacket(serverIP, serverPort);
-  Udp.print("{");
+  int beaconRSSIs[8] = {0, 0, 0, 0, 0, 0, 0, 0};
   for (int thisNet = 0; thisNet < numSsid; thisNet++) 
   {
-    Udp.print(WiFi.SSID(thisNet));
-    Udp.print(":");
-    Udp.print(WiFi.RSSI(thisNet));
-    Udp.print(",");
+    String networkName = WiFi.SSID(thisNet);
+    if(networkName.startsWith("Beacon"))
+    {
+      int id = networkName.charAt(6)-48;
+      beaconRSSIs[id] = WiFi.RSSI(thisNet);
+    }
   }
-  Udp.print("}");
+  Udp.beginPacket(serverIP, serverPort);  
+  Udp.print("{\"Beacon0\":\"");
+  Udp.print(beaconRSSIs[0]);
+  Udp.print("\", \"Beacon1\":\"");
+  Udp.print(beaconRSSIs[1]);
+  Udp.print("\", \"Beacon2\":\"");
+  Udp.print(beaconRSSIs[2]);
+  Udp.print("\", \"Beacon3\":\"");
+  Udp.print(beaconRSSIs[3]);
+  Udp.print("\", \"Beacon4\":\"");
+  Udp.print(beaconRSSIs[4]);
+  Udp.print("\", \"Beacon5\":\"");
+  Udp.print(beaconRSSIs[5]);
+  Udp.print("\", \"Beacon6\":\"");
+  Udp.print(beaconRSSIs[6]);
+  Udp.print("\", \"Beacon7\":\"");
+  Udp.print(beaconRSSIs[7]);
+  Udp.print("\"}");
   Udp.endPacket();
 
 }
