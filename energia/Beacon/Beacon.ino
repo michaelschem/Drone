@@ -29,18 +29,18 @@ void setup()
   int beaconNumber = 1*bit1 + 2*bit2 + 4*bit3;
   ssid[6] = beaconNumber+48;
   
-  Serial.begin(9600);
-  Serial.print("Setting up Access Point named ");
-  Serial.println(ssid);
+//  Serial.begin(9600);
+//  Serial.print("Setting up Access Point named ");
+//  Serial.println(ssid);
   
   WiFi.beginNetwork(ssid, pass);
-  while(WiFi.localIP() == INADDR_NONE)
-  {
-    Serial.print('.');
-    delay(300);
-  }
-   
-  Serial.println("Access Point is Active");
+//  while(WiFi.localIP() == INADDR_NONE)
+//  {
+//    Serial.print('.');
+//    delay(300);
+//  }
+//   
+//  Serial.println("Access Point is Active");
 }
 
 void loop()
