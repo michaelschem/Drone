@@ -104,7 +104,7 @@ void setup()
 void loop()
 {
   //probeGPS();
-  
+  Serial.println(".");
   //int8_t acclX = mySensor.readXData();
   //int8_t acclY = mySensor.readYData();
   //int8_t acclZ = mySensor.readZData();
@@ -149,14 +149,15 @@ void loop()
     Udp.print("\", \"TEMP\": \"");
     Udp.print(temperature);
   }
-  Udp.print("\", GPS_SPD: \"");
-  Udp.print(GPS_SPD);
-  Udp.print("' }");
+  //Udp.print("\", GPS_SPD: \"");
+  //Udp.print(GPS_SPD);
+ 
   
   getBaroSPD();
   Udp.print("\", \"BARO_SPD\": \"");
   Udp.print(speed);
   Udp.print("\"}");
+  
   Udp.endPacket();
   delay(10);
 }
