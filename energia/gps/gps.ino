@@ -46,8 +46,17 @@ void loop()
     Udp.print(GPS_ALT);
     Udp.print("\", GPS_SPD: \"");
     Udp.print(GPS_SPD);
-    Udp.print("' }");
+    Udp.print("\" }");
     Udp.endPacket();
+//    Serial.print("{ \"Lat\": \"");
+//    Serial.print(LAT);
+//    Serial.print("\", \"LNG\": \"");
+//    Serial.print(LNG);
+//    Serial.print("\", \"ALT\": \"");
+//    Serial.print(GPS_ALT);
+//    Serial.print("\", GPS_SPD: \"");
+//    Serial.print(GPS_SPD);
+//    Serial.println("\" }");
     newGPS = false;
   } 
   
@@ -55,6 +64,7 @@ void loop()
   //Array index corresponds to beacon number
   int numSsid = WiFi.scanNetworks();
   int beaconRSSIs[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+  int DR1RSSI = 0;
   for (int thisNet = 0; thisNet < numSsid; thisNet++) 
   {
     String networkName = WiFi.SSID(thisNet);
@@ -62,6 +72,10 @@ void loop()
     {
       int id = networkName.charAt(6)-48;
       beaconRSSIs[id] = WiFi.RSSI(thisNet);
+    }
+    if(networkName.startsWith("Dr1"))
+    {
+      DR1RSSI = WiFi.RSSI(thisNet);
     }
   }
   Udp.beginPacket(serverIP, serverPort);  
@@ -83,7 +97,18 @@ void loop()
   Udp.print(beaconRSSIs[7]);
   Udp.print("\"}");
   Udp.endPacket();
-
+  
+  Udp.beginPacket(serverIP,serverPort);
+  Udp.print("{\"Voltage\":\"");
+  Udp.print(analogRead(16));
+  Udp.print("\"}");
+  Udp.endPacket();
+  
+  Udp.beginPacket(serverIP,serverPort);
+  Udp.print("{\"Station WiFi Strength\":\"");
+  Udp.print(DR1RSSI);
+  Udp.print("\"}");
+  Udp.endPacket();
 }
 
 void probeGPS(){
@@ -132,8 +157,8 @@ void formatGPS() {
   }
   GPS_SPD = GPS_DATA2[7];
   GPS_TIME = GPS_DATA[1];
-  LAT = GPS_DATA[1];
-  LNG = GPS_DATA[3];
+  LAT = GPS_DATA[2];
+  LNG = GPS_DATA[4];
   GPS_ALT = GPS_DATA[9];
 }
 
