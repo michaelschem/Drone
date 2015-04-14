@@ -10,7 +10,7 @@
 char ssid[] = "Dr1";
 char password[] = "theDRONEteam1";
 unsigned int localPort = 2390;
-char serverIP[] = "192.168.1.101";
+char serverIP[] = "192.168.1.102";
 int serverPort = 42679;
 IPAddress ip;
 long rssi;

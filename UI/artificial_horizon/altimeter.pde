@@ -25,7 +25,7 @@ class altimeter {
     rect(490, 500 - alt, 50, 20);
     fill(255);
     textSize(15);
-    text(alt, 490, 515 - alt);
+    text((int)alt, 495, 515 - alt);
     
     //put strokeWeight back
     strokeWeight(1);

@@ -3,7 +3,7 @@
 char ssid[] = "Dr1";
 char password[] = "theDRONEteam1";
 unsigned int localPort = 2390;
-char serverIP[] = "192.168.1.101";
+char serverIP[] = "192.168.1.100";
 int serverPort = 42679;
 IPAddress ip;
 
@@ -22,6 +22,10 @@ void setup() {
   WiFi.begin(ssid, password);
 
   Udp.begin(localPort);
+  
+  Udp.beginPacket(serverIP, serverPort);
+  Udp.print("connected");
+  Udp.endPacket();
 
 }
 
@@ -43,6 +47,19 @@ void loop()
     Udp.endPacket();
     newGPS = false;
   } 
+  
+  int numSsid = WiFi.scanNetworks();
+  Udp.beginPacket(serverIP, serverPort);
+  Udp.print("{");
+  for (int thisNet = 0; thisNet < numSsid; thisNet++) 
+  {
+    Udp.print(WiFi.SSID(thisNet));
+    Udp.print(":");
+    Udp.print(WiFi.RSSI(thisNet));
+    Udp.print(",");
+  }
+  Udp.print("}");
+  Udp.endPacket();
 
 }
 

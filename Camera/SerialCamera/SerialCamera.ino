@@ -46,7 +46,7 @@ void setup()
   //pinMode(motorPinR,OUTPUT);
     if(Serial.available() > 0) Serial.read();
     {
-      Serial.println("Starting Loop Over");
+      Serial.println("Starting Loop Over 2");
       delay(1000);
       Serial.println("");
       capture_photo();
@@ -202,16 +202,17 @@ void capture_photo(){
   vc_frame_address =READ_DATA_BLOCK_NO;
 
   while(vc_frame_address<frame_length){	
-    //Serial.print("Accessing Data \n");
+    Serial.print("Accessing Data \n");
     VC0706_read_frame_buffer(vc_frame_address-READ_DATA_BLOCK_NO, READ_DATA_BLOCK_NO);
     delay(9);
-    //Serial.print("Data Accessed \n");
+    Serial.print("Data Accessed \n");
 
     //get the data with length=READ_DATA_BLOCK_NObytes 
     rx_ready=false;
     rx_counter=0;
     buffer_read();
 
+    Serial.print('START');
     for(int i = 5; i < 61;i++)
     {
 //       if(VC0706_rx_buffer[i] < 2)
@@ -233,7 +234,7 @@ void capture_photo(){
       Serial.print(VC0706_rx_buffer[i], HEX);
       //Serial.print(' ');
     }
-    //Serial.print('\n');
+    Serial.print('STOP\n');
 
     //read next READ_DATA_BLOCK_NO bytes from frame buffer
     vc_frame_address=vc_frame_address+READ_DATA_BLOCK_NO;
@@ -252,6 +253,7 @@ void capture_photo(){
   rx_ready=false;
   rx_counter=0;
   buffer_read();
+  Serial.print('START');
   for(int i = 5; i < 61;i++)
   {
 //    if(VC0706_rx_buffer[i] < 2)
@@ -271,9 +273,8 @@ void capture_photo(){
     if(VC0706_rx_buffer[i] < 16)
       Serial.print("0");
     Serial.print(VC0706_rx_buffer[i], HEX);
-    //Serial.print(' ');
   }
-  
+  Serial.print('STOP\n');
 
   Serial.flush();
   
