@@ -1,6 +1,6 @@
 class speed {
 
-  void display(int speed) {
+  void display(float speed) {
     fill(255);
     stroke(0);
     rect(20, 100, 80, 400);
@@ -26,6 +26,6 @@ class speed {
     rect(60, 500 - speed, 50, 20);
     fill(255);
     textSize(15);
-    text(speed, 70, 515 - speed);
+    text((int)speed, 65, 515 - speed);
   }
 }
