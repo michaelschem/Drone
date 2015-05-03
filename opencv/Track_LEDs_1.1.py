@@ -1,3 +1,6 @@
+"""This script is designed to read in a video containing 2 IR LEDs and track 
+their paths throught the course of the video """
+
 import numpy as np
 import cv2
 import cv2.cv as cv
