@@ -27,9 +27,10 @@ float pitchAngle = 0, rollAngle = 0, headingAngle = 0, temperature, baro_alt = 0
 float time, last_time, fps, last_fps;
 
 void setup() {
-  size(1200, 600);
-
-  image = loadImage("/home/mac/Drone/UI/artificial_horizon/data/test.jpg");
+  size(400, 400);
+  frame.setResizable(true);
+  
+  image = loadImage("/Users/mike/Documents/Drone/UI/artificial_horizon/data/test.jpg");
   //image = loadImage("/home/mac/Drone/UI/artificial_horizon/data/map_big.jpg");
   last_time = second() + (minute() * 60);
 
@@ -115,7 +116,7 @@ String getElement(String json, String element) {
 
 void reset() {
 
-  image(image, -20, -100, map_width/map_zoom, map_height/map_zoom );
+  //image(image, -20, -100, map_width/map_zoom, map_height/map_zoom );
 
   stroke(0);
   strokeWeight(0);
@@ -151,5 +152,3 @@ float avg(String input, float last[], String element) {
 
   return avg/history;
 }
-
-
